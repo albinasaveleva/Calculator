@@ -54,6 +54,8 @@ function App() {
         return result.match(/\d+(?=\.0+)/)[0]
       } else if (result.match(/\.\d+0+/)) {
         return result.match(/\d+\.[1-9]+(?=0+)/)[0]
+      } else {
+        return result;
       }
     } else {
       return result;

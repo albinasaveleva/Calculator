@@ -1,9 +1,6 @@
 const Screen = ({result}) => {
-  const checkedResult = () => {
-    return result ? result : '';
-  }
   return (
-    <input className="screen" value={checkedResult()} readOnly />
+    <input className="screen" value={result} readOnly />
     //<div className="screen">{result}</div>
   )
 }
