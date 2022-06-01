@@ -13,6 +13,7 @@ function App() {
   const scrollScreen = () => {
     const screen = document.querySelector('.screen');
     screen.scrollLeft = screen.scrollWidth
+    console.log('scroll')
   }
   const clearHandle = () => {
     setDecimal(false);
@@ -61,9 +62,9 @@ function App() {
         prevNumber,
         nextNumber;
 
-      if (string.match(/\*/)) {
+      if (string.match(/[\*\/]/)) {
         const index = array.findIndex((elem) => {
-          if (elem === '*') {
+          if (elem === '*' || elem === '/') {
             return true
           }
         });
@@ -72,54 +73,41 @@ function App() {
         prevNumber = array[index-1];
         nextNumber = array[index+1];
 
-        result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, bigDecimal.multiply(prevNumber, nextNumber));
-      } else if (string.match(/\//)) {
-        const index = array.findIndex((elem) => {
-          if (elem === '/') {
-            return true
-          }
-        });
-
-        operator = array[index];
-        prevNumber = array[index-1];
-        nextNumber = array[index+1];
-
-        let divideResult = bigDecimal.divide(prevNumber, nextNumber);
-        const modifyResult = () => {
-            if (divideResult.slice(-1) === '0' || divideResult.slice(-1) === '.') {
-              divideResult = divideResult.slice(0, -1);
-              if (divideResult.match(/\./)) {
-                modifyResult();
+        if (operator === '*') {
+          result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, bigDecimal.multiply(prevNumber, nextNumber));
+        } else if (operator === '/') {
+          let divideResult = bigDecimal.divide(prevNumber, nextNumber);
+          const modifyResult = () => {
+              if (divideResult.slice(-1) === '0' || divideResult.slice(-1) === '.') {
+                divideResult = divideResult.slice(0, -1);
+                if (divideResult.match(/\./)) {
+                  modifyResult();
+                }
+              } else {
+                return
               }
-            } else {
-              return
-            }
+          }
+          modifyResult()
+          result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, divideResult);
         }
-        modifyResult()
-        result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, divideResult);
-      } else if (string.match(/\+/)) {
+      }  else if (string.match(/[\+-]/)) {
         const index = array.findIndex((elem) => {
-          if (elem === '+') {
+          if (elem === '+' || elem === '-') {
             return true
           }
         });
+
         operator = array[index];
         prevNumber = array[index-1];
         nextNumber = array[index+1];
 
-        result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, bigDecimal.add(prevNumber, nextNumber));
-      } else if (string.match(/-/)) {
-        const index = array.findIndex((elem) => {
-          if (elem === '-') {
-            return true
-          }
-        });
-        operator = array[index];
-        prevNumber = array[index-1];
-        nextNumber = array[index+1];
-
-        result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, bigDecimal.subtract(prevNumber, nextNumber));
+        if (operator === '+') {
+          result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, bigDecimal.add(prevNumber, nextNumber));
+        } else if (operator === '-') {
+          result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, bigDecimal.subtract(prevNumber, nextNumber));
+        }
       }
+
       if (string.match(/ [-,\+,\*,/] /)) {
         evalHandle(result)
       } else {
