@@ -14,11 +14,13 @@ function App() {
     let result = initialResult;
     if (result.match(/\./)) {
       if (result.match(/\.0+/)) {
-        return result.match(/\d+(?=\.0+)/)[0]
+        return result.match(/-?\d+(?=\.0+)/)[0]
       } else if (result.match(/\.\d+0+/)) {
-        return result.match(/\d+\.[1-9]+(?=0+)/)[0]
-      } else if (result.match(/\d+\.$/)) {
-        return result.match(/\d+(?=\.)/)[0]
+        return result.match(/-?\d+\.[1-9]+(?=0+)/)[0]
+      } else if (result.match(/0{2,}\.$/)) {
+        return 0
+      } else if (result.match(/[1-9]+\.$/)) {
+        return result.match(/-?[1-9]+(?=\.$)/)
       } else {
         return result;
       }
@@ -26,13 +28,13 @@ function App() {
       return result;
     }
   }
-  const checkNumber = (initialNumber) => {
-    let result = initialNumber;
-    if (result.match(/\b0{2,}./)) {
-      result = result.replace(/\b0{2,}./, /\b0{2,}(?=\.)/)
-    }
-    console.log(result)
-  }
+  // const checkNumber = (initialNumber) => {
+  //   let result = initialNumber;
+  //   if (result.match(/\b0{2,}./)) {
+  //     result = result.replace(/\b0{2,}./, /\b0{2,}(?=\.)/)
+  //   }
+  //   console.log(result)
+  // }
 
   const scrollScreen = () => {
     document.querySelector('.screen').scrollTop = 999;
@@ -98,7 +100,7 @@ function App() {
         prevNumber = array[index-1];
         nextNumber = array[index+1];
 
-        if (nextNumber) {
+        // if (nextNumber) {
           if (operator === '*') {
             operationResult = bigDecimal.multiply(prevNumber, nextNumber)
             operationResult = checkResult(operationResult);
@@ -112,9 +114,9 @@ function App() {
               return
             }
           }
-        } else {
-          setResult(prevNumber)
-        }
+        // } else {
+        //   setResult(prevNumber)
+        // }
 
       }  else if (result.match(/ [\+-] /)) {
         const index = array.findIndex((elem) => {
@@ -127,19 +129,20 @@ function App() {
         prevNumber = array[index-1];
         nextNumber = array[index+1];
 
-        if (nextNumber) {
+        // if (nextNumber) {
           if (operator === '+') {
             operationResult = bigDecimal.add(prevNumber, nextNumber);
             operationResult = checkResult(operationResult);
             result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);
           } else if (operator === '-') {
+            console.log(prevNumber, nextNumber)
             operationResult = bigDecimal.subtract(prevNumber, nextNumber);
             operationResult = checkResult(operationResult);
             result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);
           }
-        } else {
-          setResult(prevNumber)
-        }
+        // } else {
+        //   setResult(prevNumber)
+        // }
       }
 
       if (result.match(/ [-,\+,\*,/] /)) {
@@ -148,7 +151,7 @@ function App() {
         setResult(result)
       }
     } else {
-      setResult(result)
+      setResult(checkResult(result))
     }
 
     setBlocked(true)
