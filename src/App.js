@@ -135,7 +135,6 @@ function App() {
             operationResult = checkResult(operationResult);
             result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);
           } else if (operator === '-') {
-            console.log(prevNumber, nextNumber)
             operationResult = bigDecimal.subtract(prevNumber, nextNumber);
             operationResult = checkResult(operationResult);
             result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);
