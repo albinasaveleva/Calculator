@@ -13,7 +13,6 @@ function App() {
   const scrollScreen = () => {
     const screen = document.querySelector('.screen');
     screen.scrollLeft = screen.scrollWidth
-    console.log('scroll')
   }
   const clearHandle = () => {
     setDecimal(false);
