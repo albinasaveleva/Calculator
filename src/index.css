@@ -39,6 +39,7 @@ html {
 	background: rgba(0, 0, 0, 0.2);
 	border-radius: 3px;
 	box-shadow: inset 0px 4px rgba(0, 0, 0, 0.2);
+	/* overflow-x: scroll; */
 	
 	font-size: 17px;
 	line-height: 40px;

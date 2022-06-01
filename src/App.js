@@ -12,7 +12,7 @@ function App() {
 
   const scrollScreen = () => {
     const screen = document.querySelector('.screen');
-    screen.scrollLeft = screen.scrollWidth
+    screen.scrollLeft += 50;
   }
   const clearHandle = () => {
     setDecimal(false);
@@ -47,6 +47,18 @@ function App() {
       scrollScreen();
     }
   }
+  const modifyResult = (initialResult) => {
+    let result = initialResult;
+    if (result.match(/\./)) {
+      if (result.match(/\.0+/)) {
+        return result.match(/\d+(?=\.0+)/)[0]
+      } else if (result.match(/\.\d+0+/)) {
+        return result.match(/\d+\.[1-9]+(?=0+)/)[0]
+      }
+    } else {
+      return result;
+    }
+}
   const evalHandle = (string) => {
     let result = string.trim();
 
@@ -59,9 +71,10 @@ function App() {
 
       let operator,
         prevNumber,
-        nextNumber;
+        nextNumber,
+        operationResult;
 
-      if (string.match(/[\*\/]/)) {
+      if (string.match(/ [\*\/] /)) {
         const index = array.findIndex((elem) => {
           if (elem === '*' || elem === '/') {
             return true
@@ -73,23 +86,19 @@ function App() {
         nextNumber = array[index+1];
 
         if (operator === '*') {
-          result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, bigDecimal.multiply(prevNumber, nextNumber));
+          operationResult = bigDecimal.multiply(prevNumber, nextNumber)
+          operationResult = modifyResult(operationResult);
+          result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);
         } else if (operator === '/') {
-          let divideResult = bigDecimal.divide(prevNumber, nextNumber);
-          const modifyResult = () => {
-              if (divideResult.slice(-1) === '0' || divideResult.slice(-1) === '.') {
-                divideResult = divideResult.slice(0, -1);
-                if (divideResult.match(/\./)) {
-                  modifyResult();
-                }
-              } else {
-                return
-              }
+          if (nextNumber !== '0') {
+            operationResult = bigDecimal.divide(prevNumber, nextNumber);
+            operationResult = modifyResult(operationResult);
+            result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);  
+          } else {
+            return
           }
-          modifyResult()
-          result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, divideResult);
         }
-      }  else if (string.match(/[\+-]/)) {
+      }  else if (string.match(/ [\+-] /)) {
         const index = array.findIndex((elem) => {
           if (elem === '+' || elem === '-') {
             return true
@@ -101,9 +110,13 @@ function App() {
         nextNumber = array[index+1];
 
         if (operator === '+') {
-          result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, bigDecimal.add(prevNumber, nextNumber));
+          operationResult = bigDecimal.add(prevNumber, nextNumber);
+          operationResult = modifyResult(operationResult);
+          result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);
         } else if (operator === '-') {
-          result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, bigDecimal.subtract(prevNumber, nextNumber));
+          operationResult = bigDecimal.subtract(prevNumber, nextNumber);
+          operationResult = modifyResult(operationResult);
+          result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);
         }
       }
 
@@ -120,10 +133,21 @@ function App() {
     scrollScreen();
   }
   const decimalHandle = () => {
-    if (!decimal && result.slice(-1).match(/[0-9]/)) {
-      setDecimal(true);
-      setResult(`${result}.`);
+    if (blocked) { 
+      if (result.match(/\./)) {
+        setDecimal(true);
+      } else {
+        setDecimal(true);
+        setResult(`${result}.`);
+        setBlocked(false);
+      }
+    } else {
+      if (!decimal && result.slice(-1).match(/[0-9]/)) {
+        setDecimal(true);
+        setResult(`${result}.`);
+      }
     }
+
     scrollScreen();
   }
 
