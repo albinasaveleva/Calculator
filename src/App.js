@@ -10,9 +10,32 @@ function App() {
 
   const bigDecimal = require('js-big-decimal');
 
+  const checkResult = (initialResult) => {
+    let result = initialResult;
+    if (result.match(/\./)) {
+      if (result.match(/\.0+/)) {
+        return result.match(/\d+(?=\.0+)/)[0]
+      } else if (result.match(/\.\d+0+/)) {
+        return result.match(/\d+\.[1-9]+(?=0+)/)[0]
+      } else if (result.match(/\d+\.$/)) {
+        return result.match(/\d+(?=\.)/)[0]
+      } else {
+        return result;
+      }
+    } else {
+      return result;
+    }
+  }
+  const checkNumber = (initialNumber) => {
+    let result = initialNumber;
+    if (result.match(/\b0{2,}./)) {
+      result = result.replace(/\b0{2,}./, /\b0{2,}(?=\.)/)
+    }
+    console.log(result)
+  }
+
   const scrollScreen = () => {
-    const screen = document.querySelector('.screen');
-    screen.scrollLeft += 50;
+    document.querySelector('.screen').scrollTop = 999;
   }
   const clearHandle = () => {
     setDecimal(false);
@@ -28,6 +51,7 @@ function App() {
       clearHandle();
       setResult(`${content}`);
     }
+    // checkNumber(result)
     scrollScreen();
   }
   const operatorHandle = (content) => {
@@ -47,20 +71,7 @@ function App() {
       scrollScreen();
     }
   }
-  const modifyResult = (initialResult) => {
-    let result = initialResult;
-    if (result.match(/\./)) {
-      if (result.match(/\.0+/)) {
-        return result.match(/\d+(?=\.0+)/)[0]
-      } else if (result.match(/\.\d+0+/)) {
-        return result.match(/\d+\.[1-9]+(?=0+)/)[0]
-      } else {
-        return result;
-      }
-    } else {
-      return result;
-    }
-}
+
   const evalHandle = (string) => {
     let result = string.trim();
 
@@ -68,15 +79,15 @@ function App() {
       result = result.slice(0,-2);
     }
 
-    if (string.match(/ [-,\+,\*,\/] /)) {
-      const array = string.trim().split(" ");
+    if (result.match(/ [-,\+,\*,\/] /)) {
+      const array = result.trim().split(" ");
 
       let operator,
         prevNumber,
         nextNumber,
         operationResult;
 
-      if (string.match(/ [\*\/] /)) {
+      if (result.match(/ [\*\/] /)) {
         const index = array.findIndex((elem) => {
           if (elem === '*' || elem === '/') {
             return true
@@ -87,20 +98,25 @@ function App() {
         prevNumber = array[index-1];
         nextNumber = array[index+1];
 
-        if (operator === '*') {
-          operationResult = bigDecimal.multiply(prevNumber, nextNumber)
-          operationResult = modifyResult(operationResult);
-          result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);
-        } else if (operator === '/') {
-          if (nextNumber !== '0') {
-            operationResult = bigDecimal.divide(prevNumber, nextNumber);
-            operationResult = modifyResult(operationResult);
-            result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);  
-          } else {
-            return
+        if (nextNumber) {
+          if (operator === '*') {
+            operationResult = bigDecimal.multiply(prevNumber, nextNumber)
+            operationResult = checkResult(operationResult);
+            result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);
+          } else if (operator === '/') {
+            if (nextNumber !== '0') {
+              operationResult = bigDecimal.divide(prevNumber, nextNumber);
+              operationResult = checkResult(operationResult);
+              result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);  
+            } else {
+              return
+            }
           }
+        } else {
+          setResult(prevNumber)
         }
-      }  else if (string.match(/ [\+-] /)) {
+
+      }  else if (result.match(/ [\+-] /)) {
         const index = array.findIndex((elem) => {
           if (elem === '+' || elem === '-') {
             return true
@@ -111,18 +127,22 @@ function App() {
         prevNumber = array[index-1];
         nextNumber = array[index+1];
 
-        if (operator === '+') {
-          operationResult = bigDecimal.add(prevNumber, nextNumber);
-          operationResult = modifyResult(operationResult);
-          result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);
-        } else if (operator === '-') {
-          operationResult = bigDecimal.subtract(prevNumber, nextNumber);
-          operationResult = modifyResult(operationResult);
-          result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);
+        if (nextNumber) {
+          if (operator === '+') {
+            operationResult = bigDecimal.add(prevNumber, nextNumber);
+            operationResult = checkResult(operationResult);
+            result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);
+          } else if (operator === '-') {
+            operationResult = bigDecimal.subtract(prevNumber, nextNumber);
+            operationResult = checkResult(operationResult);
+            result = result.replace(`${prevNumber} ${operator} ${nextNumber}`, operationResult);
+          }
+        } else {
+          setResult(prevNumber)
         }
       }
 
-      if (string.match(/ [-,\+,\*,/] /)) {
+      if (result.match(/ [-,\+,\*,/] /)) {
         evalHandle(result)
       } else {
         setResult(result)
@@ -130,6 +150,7 @@ function App() {
     } else {
       setResult(result)
     }
+
     setBlocked(true)
     setDecimal(false);
     scrollScreen();

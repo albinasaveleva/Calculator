@@ -28,25 +28,36 @@ html {
 .top {
 	display: flex;
   justify-content: space-between;
+	margin-bottom: 11px;
+}
+
+.screen-wrapper {
+	width: 212px;
+	height: 100px;
+
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 3px;
+	/* box-shadow: inset 0px 4px rgba(0, 0, 0, 0.2); */
 }
 
 .screen {
-	height: 40px;
+	height: 100px;
 	width: 212px;
 		
-	padding: 0 10px;
+	padding: 10px;
 	
-	background: rgba(0, 0, 0, 0.2);
-	border-radius: 3px;
-	box-shadow: inset 0px 4px rgba(0, 0, 0, 0.2);
-	/* overflow-x: scroll; */
+	background: transparent;
+	/* border-radius: 3px;
+	box-shadow: inset 0px 4px rgba(0, 0, 0, 0.2); */
 	
-	font-size: 17px;
-	line-height: 40px;
+	font-size: 15px;
+	line-height: 20px;
 	color: white;
 	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 	text-align: right;
 	letter-spacing: 1px;
+	overflow-wrap: anywhere;
+	overflow-y: auto;
 
   outline: none;
   border: none;
@@ -95,9 +106,14 @@ html {
 }
 
 .key_type_clear {
+	height: 100px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	background: #ff9fa8;
 	box-shadow: 0px 4px #ff7c87;
 	color: white;
+	margin-bottom: 0;
 }
 
 .key:hover {

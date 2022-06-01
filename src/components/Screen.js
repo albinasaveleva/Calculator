@@ -1,8 +1,10 @@
 const Screen = ({result}) => {
   return (
-    <input className="screen" value={result} readOnly />
-    //<div className="screen">{result}</div>
+    <div className="screen-wrapper">
+      <div className="screen">{result}</div>
+    </div>
   )
 }
+//<input className="screen" value={result} readOnly />
 
 export default Screen;
